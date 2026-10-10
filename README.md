@@ -11,6 +11,17 @@ Projeto pessoal de compilação do YouTube modificado com **ReVanced CLI 6**, pr
 
 Não selecionamos **Custom branding** nem patches visuais. Não há login embutido em nosso código: a autenticação usa o GmsCore separado, sem armazenar sua senha no GitHub.
 
+## Primeiro APK compilado
+
+Em **10/10/2026**, foi compilado a partir do APK original YouTube **20.40.45 (nodpi, universal, minSdk 28)**, usando o ReVanced CLI 6.0.0. Os **seis patches** escolhidos (incluindo `Video ads`) foram aplicados com sucesso. O APK resultante foi validado por `ApkVerifier`, que confirmou assinatura **APK Signature Scheme v3** sem erros.
+
+- ID do pacote secundario: `app.revanced.android.youtube`.
+- SHA-256 do APK: `55e8bcbbdd87d6563ea6796abdb8a46395718979c61aca66635ce64784ac1f28`.
+- Certificado SHA-256: `c1be990b2776511c32f72b2ab3a1865fead41ec9dce2c238345c5d79ee7e2a06`.
+- O APK e a keystore foram entregues **na conversa**, e **nao foram enviados ao GitHub publico**.
+- O login Google, a interface e a estabilidade ainda precisam de teste em um celular Android fisico.
+- A primeira compilacao do arquivo enviado foi feita em um ambiente de build separado, utilizando as ferramentas oficiais baixadas pelo GitHub Actions. Para reproduzir a compilacao dentro do proprio Actions, sera necessario disponibilizar o APK-base como descrito abaixo.
+
 ## Estado
 - ✅ Scripts de build e seleção de patches enviados.
 - ✅ Verificação automática do ReVanced a cada alteração no GitHub (push).
