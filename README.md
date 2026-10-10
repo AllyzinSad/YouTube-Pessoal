@@ -27,6 +27,20 @@ Não selecionamos **Custom branding** nem patches visuais. Não há login embuti
 ### Atenção ao repositório público
 Não coloque `youtube.apk` ou dados de assinatura na árvore de código. Se a release estiver pública, **seus arquivos também ficam públicos**. Prefira um repositório privado para compilar e armazenar APK e keystore. Enquanto o repositório for público, a validação dos scripts pode ser executada independentemente do APK.
 
+## Compilação enquanto o repositório estiver público
+
+Para evitar expor a assinatura e o APK, configure o secret `YOUTUBE_BUILD_PASSWORD` nas configurações do GitHub Actions. O artefato final será criptografado (`.tar.gz.enc`). Para abrir no PC com OpenSSL:
+
+```bash
+openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \\
+  -in youtube-pessoal.tar.gz.enc \\
+  -out youtube-pessoal.tar.gz \\
+  -pass env:YOUTUBE_BUILD_PASSWORD
+tar -xzf youtube-pessoal.tar.gz
+```
+
+Defina a variável `YOUTUBE_BUILD_PASSWORD` no computador para a mesma senha registrada no secret. Quando o repositório estiver privado, o workflow publica o APK e a assinatura diretamente (sem criptografia). Guarde a keystore para permitir atualizações futuras sem reinstalar o app.
+
 ## Requisitos técnicos
 A versão-base precisa ser **APK completo (não APKS/APKM/XAPK)** compatível com os patches atuais, como indicado no [ReVanced Manager](https://revanced.app). A arquitetura 32/64-bit e o Android mínimo dependem do APK de origem. Android 8 e 2 GB RAM são metas de compatibilidade, não garantias.
 
