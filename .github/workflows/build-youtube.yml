@@ -1,89 +1,133 @@
-name: YouTube pessoal - compilar APK
+name: YouTube pessoal - verificar e compilar
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-youtube.yml'
+      - 'scripts/**'
+      - 'README.md'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  patch:
-    name: Criar APK secundario
+  verificar-e-compilar:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Exigir repositorio privado (protege APK e chave)
-        env:
-          REPO_PRIVATE: ${{ github.event.repository.private }}
-        run: |
-          if [[ "$REPO_PRIVATE" != "true" ]]; then
-            echo "::error::Torne o repositorio PRIVADO em Settings > General > Danger Zone antes de executar."
-            exit 1
-          fi
-
-      - name: Baixar arquivos do projeto
+      - name: Obter fontes do projeto
         uses: actions/checkout@v4
 
-      - name: Instalar Java
+      - name: Instalar Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Conferir APK-base privado
+      - name: Verificar sintaxe dos scripts
+        run: |
+          bash -n scripts/preparar-ferramentas.sh
+          bash -n scripts/compilar.sh
+
+      - name: Baixar CLI e verificar os cinco patches oficiais
+        run: bash scripts/preparar-ferramentas.sh
+
+      - name: Publicar lista de patches (diagnostico)
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-patches
+          path: output/patches-disponiveis.txt
+          retention-days: 3
+
+      - name: Conferir configuracao de compilacao
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
+        env:
+          REPO_PRIVATE: ${{ github.event.repository.private }}
+          BUILD_PASSWORD: ${{ secrets.YOUTUBE_BUILD_PASSWORD }}
         run: |
           set -euo pipefail
-          mkdir -p input tools output
-          if ! gh release download youtube-base --repo "$GITHUB_REPOSITORY" --pattern youtube.apk --dir input --clobber; then
-            echo "::error::Adicione um youtube.apk completo como asset do Release com tag youtube-base (repositorio privado)."
+          if [[ "$REPO_PRIVATE" != "true" && -z "$BUILD_PASSWORD" ]]; then
+            echo "::error::Em repositorio publico, crie o secret YOUTUBE_BUILD_PASSWORD para criptografar o APK e a assinatura antes do upload."
             exit 1
           fi
-          test -s input/youtube.apk
-          file input/youtube.apk
 
-      - name: Baixar ReVanced CLI e patches oficiais
+      - name: Obter APK-base
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
+        env:
+          YOUTUBE_APK_URL: ${{ secrets.YOUTUBE_APK_URL }}
         run: |
           set -euo pipefail
-          gh release download --repo ReVanced/revanced-cli --pattern '*-all.jar' --dir tools --clobber
-          curl --fail --location --retry 3 --silent --show-error \
-            'https://api.revanced.app/v5/patches.rvp' --output tools/patches.rvp
-          test "$(find tools -maxdepth 1 -name '*-all.jar' | wc -l)" -eq 1
-          test "$(find tools -maxdepth 1 -name '*.rvp' | wc -l)" -eq 1
+          mkdir -p input output
+          if [[ -n "$YOUTUBE_APK_URL" ]]; then
+            curl --fail --location --retry 3 --silent --show-error \
+              "$YOUTUBE_APK_URL" --output input/youtube.apk
+          else
+            if ! gh release download youtube-base --repo "$GITHUB_REPOSITORY" \
+              --pattern youtube.apk --dir input --clobber; then
+              echo "::error::Preciso do APK-base completo do YouTube: configure YOUTUBE_APK_URL ou anexe youtube.apk na release youtube-base."
+              exit 1
+            fi
+          fi
+          test -s input/youtube.apk
+          unzip -tqq input/youtube.apk
+          unzip -Z -1 input/youtube.apk | grep -Fxq AndroidManifest.xml
 
-      - name: Restaurar assinatura pessoal, se configurada
+      - name: Recuperar a mesma assinatura para atualizacoes
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         env:
           YOUTUBE_KEYSTORE_B64: ${{ secrets.YOUTUBE_KEYSTORE_B64 }}
         run: |
           set -euo pipefail
+          mkdir -p output
           if [[ -n "$YOUTUBE_KEYSTORE_B64" ]]; then
             printf '%s' "$YOUTUBE_KEYSTORE_B64" | base64 --decode > output/youtube-personal.keystore
             test -s output/youtube-personal.keystore
           fi
 
-      - name: Aplicar patches e assinar APK
-        shell: bash
+      - name: Aplicar AdBlock, GmsCore, SponsorBlock e player
+        if: github.event_name == 'workflow_dispatch'
         run: bash scripts/compilar.sh
 
-      - name: Conferir resultado
+      - name: Criptografar APK e assinatura em repositorio publico
+        if: github.event_name == 'workflow_dispatch' && !github.event.repository.private
         shell: bash
+        env:
+          YOUTUBE_BUILD_PASSWORD: ${{ secrets.YOUTUBE_BUILD_PASSWORD }}
         run: |
           set -euo pipefail
-          test -s output/YouTube-Pessoal.apk
-          test -s output/youtube-personal.keystore
-          sha256sum output/YouTube-Pessoal.apk > output/SHA256.txt
+          tar czf output/youtube-pessoal.tar.gz -C output \
+            YouTube-Pessoal.apk SHA256.txt youtube-personal.keystore
+          openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
+            -in output/youtube-pessoal.tar.gz \
+            -out output/youtube-pessoal.tar.gz.enc \
+            -pass env:YOUTUBE_BUILD_PASSWORD
+          rm -f output/youtube-pessoal.tar.gz
 
-      - name: Disponibilizar APK privado e chave (1 dia)
+      - name: Publicar APK e assinatura no repositorio privado
+        if: github.event_name == 'workflow_dispatch' && github.event.repository.private
         uses: actions/upload-artifact@v4
         with:
-          name: YouTube-Pessoal-APK-e-assinatura
+          name: YouTube-Pessoal-APK
           path: |
             output/YouTube-Pessoal.apk
             output/SHA256.txt
             output/youtube-personal.keystore
-          if-no-files-found: error
           retention-days: 1
+          if-no-files-found: error
+
+      - name: Publicar pacote criptografado no repositorio publico
+        if: github.event_name == 'workflow_dispatch' && !github.event.repository.private
+        uses: actions/upload-artifact@v4
+        with:
+          name: YouTube-Pessoal-CRIPTOGRAFADO
+          path: output/youtube-pessoal.tar.gz.enc
+          retention-days: 1
+          if-no-files-found: error
