@@ -77,7 +77,7 @@ jobs:
           fi
           test -s input/youtube.apk
           unzip -tqq input/youtube.apk
-          unzip -Z -1 input/youtube.apk | grep -Fxq AndroidManifest.xml
+          unzip -Z -1 input/youtube.apk | grep -Fx AndroidManifest.xml >/dev/null
 
       - name: Recuperar a mesma assinatura para atualizacoes
         if: github.event_name == 'workflow_dispatch'
