@@ -17,6 +17,14 @@ Não selecionamos **Custom branding** nem patches visuais. Não há login embuti
 - ⏳ Compilação real precisa do **APK original completo** do YouTube em versão compatível.
 - ⏳ Testes de instalação e login precisam de um celular físico.
 
+## Versao-base recomendada neste build
+
+O diagnostico de patches oficiais coletado em 10/10/2026 confirmou **YouTube 20.40.45** como versao compativel com os cinco recursos selecionados.
+
+O APK **21.39.525** enviado para verificacao tem Android minimo 10 (API 29), arquitetura universal, mas **nao consta como compativel com esses patches**. Nao use versoes fora da lista: a etapa `scripts/validar-apk.py` falhara antecipadamente para proteger contra APKs defeituosos.
+
+Para ter maior compatibilidade, use a variante **YouTube 20.40.45 (APK, nodpi, universal, Android 9.0+, NAO BUNDLE)**. Consulte a pagina [APKMirror - YouTube 20.40.45](https://www.apkmirror.com/apk/google-inc/youtube/youtube-20-40-45-release/youtube-20-40-45-2-android-apk-download/).
+
 ## GitHub Actions
 
 1. Ao atualizar os scripts, o GitHub Actions executa a etapa de validação dos programas e patches, **sem APK original**.
