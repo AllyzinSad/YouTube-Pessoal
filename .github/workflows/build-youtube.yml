@@ -37,6 +37,17 @@ jobs:
       - name: Baixar CLI e verificar os cinco patches oficiais
         run: bash scripts/preparar-ferramentas.sh
 
+      - name: Entregar ferramentas oficiais para compilacao com APK fornecido no chat
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: revanced-ferramentas-verified
+          path: |
+            tools/revanced-cli.jar
+            tools/patches.rvp
+          retention-days: 1
+          if-no-files-found: error
+
       - name: Publicar lista de patches (diagnostico)
         if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
