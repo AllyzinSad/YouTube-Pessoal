@@ -16,7 +16,7 @@ unzip -tqq input/youtube.apk >/dev/null || {
   echo "O arquivo de entrada nao e um APK/ZIP integro." >&2
   exit 1
 }
-unzip -Z -1 input/youtube.apk | grep -Fxq "AndroidManifest.xml" || {
+unzip -Z -1 input/youtube.apk | grep -Fx "AndroidManifest.xml" >/dev/null || {
   echo "Arquivo nao e um APK Android valido (AndroidManifest.xml ausente)." >&2
   exit 1
 }
