@@ -24,6 +24,7 @@ unzip -Z -1 input/youtube.apk | grep -Fx "AndroidManifest.xml" >/dev/null || {
 patches=(
   "GmsCore support"
   "Hide ads"
+  "Video ads"
   "SponsorBlock"
   "Spoof video streams"
   "Remove background playback restrictions"
@@ -39,8 +40,8 @@ done
 
 echo "Patches: ${patches[*]}"
 echo "Branding original preservado; nao selecionamos patches de alteracao de nome/icone."
-java -jar tools/revanced-cli.jar patch \
-  -bp tools/patches.rvp \
+java -Djava.awt.headless=true -Xmx3200m -jar tools/revanced-cli.jar patch \
+  -p tools/patches.rvp -b \
   --exclusive \
   "${args[@]}" \
   --keystore output/youtube-personal.keystore \
