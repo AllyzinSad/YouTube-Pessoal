@@ -1,0 +1,23 @@
+name: Ferramenta de recursos APK
+on:
+  push:
+    paths:
+      - '.github/workflows/support-tools.yml'
+permissions:
+  contents: read
+jobs:
+  apktool:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter APKTool oficial
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar -o apktool.jar
+          echo "dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  apktool.jar" | sha256sum -c -
+          java -jar apktool.jar --version
+      - name: Arquivar ferramenta para processo de compilacao
+        uses: actions/upload-artifact@v4
+        with:
+          name: apktool-oficial-3.0.3
+          path: apktool.jar
+          retention-days: 1
