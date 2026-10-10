@@ -32,6 +32,7 @@ jobs:
         run: |
           bash -n scripts/preparar-ferramentas.sh
           bash -n scripts/compilar.sh
+          python3 -m py_compile scripts/validar-apk.py
 
       - name: Baixar CLI e verificar os cinco patches oficiais
         run: bash scripts/preparar-ferramentas.sh
@@ -78,6 +79,10 @@ jobs:
           test -s input/youtube.apk
           unzip -tqq input/youtube.apk
           unzip -Z -1 input/youtube.apk | grep -Fx AndroidManifest.xml >/dev/null
+
+      - name: Validar pacote, Android minimo e compatibilidade real dos patches
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/validar-apk.py input/youtube.apk --patches output/patches-disponiveis.txt
 
       - name: Recuperar a mesma assinatura para atualizacoes
         if: github.event_name == 'workflow_dispatch'
