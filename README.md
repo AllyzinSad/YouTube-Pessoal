@@ -81,7 +81,15 @@ Se usar uma chave nova, a atualização poderá exigir desinstalação antes da 
 - **APK original ausente**: configure a release `youtube-base` com o asset `youtube.apk`, ou o secret `YOUTUBE_APK_URL`.
 - **Patch incompatível**: use a versão de YouTube sugerida pelo ReVanced.
 - **Login falha**: atualize ReVanced GmsCore e confira o patch GmsCore support.
-- **Vídeo não carrega**: mantenha habilitado Spoof video streams.
+- **Vídeo trava, fica preto ou pausa após alguns minutos (relatado em 10/10/2026)**: primeiro tente alterar o cliente do patch **Spoof video streams** no aplicativo instalado, sem reinstalar:
+  1. Abra YouTube modificado > Você > Configurações > ReVanced > Diversos (Miscellaneous) > Spoof video streams.
+  2. Verifique que o recurso está ativado. Em **Default client**, selecione **visionOS**.
+  3. Force o fechamento do YouTube e abra de novo; teste o mesmo vídeo depois do ponto onde travou.
+  4. Se persistir, troque o cliente para **Android VR**, feche o aplicativo e teste novamente.
+  5. Em vídeos longos, também vale testar ReVanced > Vídeo > **Force AVC (H.264)** ligado e **HDR** desligado, se estas opções aparecerem.
+  6. Se nenhum cliente funcionar, atualize os patches de origem e recrie o APK com a mesma chave de assinatura, sem apagar dados antes de investigar.
+  Relatos compatíveis: [ReVanced discussão #1453](https://github.com/orgs/ReVanced/discussions/1453), [issue #3381](https://github.com/ReVanced/revanced-manager/issues/3381), [issue #3534](https://github.com/revanced/revanced-manager/issues/3534).
+- **Vídeo não carrega**: confirme que Spoof video streams está ativado, experimente os clientes acima e atualize os patches se necessário.
 - **Falha na instalação**: confirme o APK completo, arquitetura, assinatura e versão do Android.
 
 Este é um mecanismo de modificação de um aplicativo de terceiros. Pode falhar após atualizações do YouTube, e o bloqueio de anúncios pode contrariar os termos de uso da plataforma.
