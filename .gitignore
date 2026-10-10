@@ -1,0 +1,10 @@
+# Arquivos proprietários, resultados e segredos: nunca versionar
+input/
+output/
+tools/
+*.apk
+*.apks
+*.apkm
+*.xapk
+*.keystore
+*.jks
