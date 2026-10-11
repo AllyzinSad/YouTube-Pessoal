@@ -22,6 +22,23 @@ Em **10/10/2026**, foi compilado a partir do APK original YouTube **20.40.45 (no
 - O login Google, a interface e a estabilidade ainda precisam de teste em um celular Android fisico.
 - A primeira compilacao do arquivo enviado foi feita em um ambiente de build separado, utilizando as ferramentas oficiais baixadas pelo GitHub Actions. Para reproduzir a compilacao dentro do proprio Actions, sera necessario disponibilizar o APK-base como descrito abaixo.
 
+## YouTube Pessoal v1.1 — 10/10/2026
+
+A primeira atualização para Android foi compilada e validada com o mesmo certificado da v1.0.
+
+- **Spoof video streams:** `visionOS` tornou-se o padrão de novas instalações. A preferência já salva pelo usuário continua respeitada.
+- **Crédito:** `Desenvolvido por AllyzinSad` aparece discretamente no fim da tela ReVanced em Configurações.
+- Mantidos: nome/ícone/interface originais, AdBlock, SponsorBlock, login via GmsCore, arquiteturas universais.
+- Pacote: `app.revanced.android.youtube`, YouTube base 20.40.45.
+- Certificado SHA-256: `c1be990b2776511c32f72b2ab3a1865fead41ec9dce2c238345c5d79ee7e2a06` (igual ao da v1.0).
+- APK final SHA-256: `3c1da1ecfb6e949afb645d316f4e6444ccd4699637470400444a38a6c16943e3`.
+- O APK foi entregue na conversa, **não** publicado no repositório público.
+- A funcionalidade precisa ser validada em um celular real após a instalação.
+
+O script `scripts/customizar-v1.1.sh` executa após o ReVanced CLI e reassina o APK usando a **mesma keystore**, por meio de `scripts/SignAPK.java`. Ele impede que o build passe se os caminhos de recursos ou código de spoofing mudarem. Não faça upload da keystore para o repositório.
+
+**Atualização:** instale por cima da v1.0. Não limpe os dados se quiser preservar login e preferências. Se a opção de streaming atual já for visionOS, ela continuará assim.
+
 ## Estado
 - ✅ Scripts de build e seleção de patches enviados.
 - ✅ Verificação automática do ReVanced a cada alteração no GitHub (push).
