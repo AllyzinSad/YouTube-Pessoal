@@ -32,6 +32,7 @@ jobs:
         run: |
           bash -n scripts/preparar-ferramentas.sh
           bash -n scripts/compilar.sh
+          bash -n scripts/customizar-v1.1.sh
           python3 -m py_compile scripts/validar-apk.py
 
       - name: Baixar CLI e verificar os cinco patches oficiais
@@ -111,6 +112,10 @@ jobs:
       - name: Aplicar AdBlock, GmsCore, SponsorBlock e player
         if: github.event_name == 'workflow_dispatch'
         run: bash scripts/compilar.sh
+
+      - name: Definir visionOS como padrao e exibir credito AllyzinSad (v1.1)
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/customizar-v1.1.sh
 
       - name: Criptografar APK e assinatura em repositorio publico
         if: github.event_name == 'workflow_dispatch' && !github.event.repository.private
