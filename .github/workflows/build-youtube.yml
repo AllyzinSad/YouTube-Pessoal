@@ -34,6 +34,7 @@ jobs:
           bash -n scripts/compilar.sh
           bash -n scripts/customizar-v1.1.sh
           python3 -m py_compile scripts/validar-apk.py
+          python3 -m py_compile scripts/incrementar-versioncode.py
 
       - name: Baixar CLI e verificar os cinco patches oficiais
         run: bash scripts/preparar-ferramentas.sh
@@ -116,6 +117,19 @@ jobs:
       - name: Definir visionOS como padrao e exibir credito AllyzinSad (v1.1)
         if: github.event_name == 'workflow_dispatch'
         run: bash scripts/customizar-v1.1.sh
+
+      - name: Corrigir versionCode e assinar a atualizacao v1.2
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/incrementar-versioncode.py output/YouTube-Pessoal.apk output/YouTube-Pessoal-v1.2-unsigned.apk
+          javac -cp tools/revanced-cli.jar -d output scripts/SignAPK.java
+          java -Xmx2500m -cp output:tools/revanced-cli.jar SignAPK output/youtube-personal.keystore \
+            output/YouTube-Pessoal-v1.2-unsigned.apk output/YouTube-Pessoal-v1.2-signed.apk
+          mv output/YouTube-Pessoal-v1.2-signed.apk output/YouTube-Pessoal.apk
+          rm -f output/YouTube-Pessoal-v1.2-unsigned.apk
+          sha256sum output/YouTube-Pessoal.apk > output/SHA256.txt
 
       - name: Criptografar APK e assinatura em repositorio publico
         if: github.event_name == 'workflow_dispatch' && !github.event.repository.private
