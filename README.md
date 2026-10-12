@@ -39,6 +39,16 @@ O script `scripts/customizar-v1.1.sh` executa após o ReVanced CLI e reassina o 
 
 **Atualização:** instale por cima da v1.0. Não limpe os dados se quiser preservar login e preferências. Se a opção de streaming atual já for visionOS, ela continuará assim.
 
+## Atualização v1.2 — erro ao instalar por cima
+
+O teste nos aparelhos apontou dois problemas distintos:
+
+1. **Atualização da v1.1 falhando:** na comparação local dos APKs v1.0 e v1.1, o certificado SHA-256 e o identificador `app.revanced.android.youtube` são iguais, mas ambos tinham o mesmo `versionCode: 1557278144`. A v1.2 mantém o pacote e assinatura e aumenta o código para `1557278145`, para ajudar o Android a reconhecer a instalação como atualização. O APK foi verificado com assinatura v3. Se falhar novamente, precisamos da mensagem de erro do instalador; não desinstalar ainda.
+
+2. **Mensagem "Verificação falhou / o aplicativo não parece ter sido patcheado por você":** esse aviso vem de uma verificação interna do ReVanced, pois a modificação foi gerada fora do Manager oficial. O aviso **não é prova de malware, mas também não atesta a segurança**. Segundo a mensagem, aparece até duas vezes. Não se recomenda remover mecanismos de verificação de segurança; a alternativa de confiança é realizar a aplicação dos patches pessoalmente pelo ReVanced Manager.
+
+A atualização v1.2 foi enviada como arquivo privado na conversa, sem publicar o APK no repositório público. O workflow agora usa `scripts/incrementar-versioncode.py` e a mesma chave para produzir futuras compilações reproduzíveis a partir da base 20.40.45.
+
 ## Estado
 - ✅ Scripts de build e seleção de patches enviados.
 - ✅ Verificação automática do ReVanced a cada alteração no GitHub (push).
